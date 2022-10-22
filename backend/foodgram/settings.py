@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'api',
+    'recipes',
     'recipes.ingredients',
     'users',
 ]

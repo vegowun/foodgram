@@ -9,5 +9,8 @@ class IngredientModelTestCase(TestCase):
     def setUp(self) -> None:
         self.ingredient = Ingredient.objects.create()
 
+    def tearDown(self) -> None:
+        self.ingredient.delete()
+
     def test_name(self):
         self.assertEqual(str(self.ingredient), self.ingredient.name)
