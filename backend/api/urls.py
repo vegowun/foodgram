@@ -5,6 +5,7 @@ from api.views.ingredients import IngredientViewSet
 
 router = routers.DefaultRouter()
 router.register('ingredients', IngredientViewSet, basename='ingredients')
+router.register('recipes', IngredientViewSet, basename='recipes')
 
 app_name = 'api'
 
