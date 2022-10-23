@@ -90,14 +90,15 @@ class RecipeViewSetTestCase(TestCase):
             amount=200
         )
 
-        self.url = reverse('api:recipes-list')
+        self.url_list = reverse('api:recipes-list')
+        # self.url_detail = reverse('api:recipes-detail')
 
     def check_object(self, data, obj):
         self.assertEqual(data.get('id'), obj.pk)
         self.assertEqual(data.get('name'), obj.name)
 
     def test_get_list(self):
-        resp = self.client.get(self.url)
+        resp = self.client.get(self.url_list)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.check_object(resp.data[0], self.recipe)
