@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from recipes.ingredients.models import Ingredient
-from recipes.models import Recipe, IngredientInRecipe
+from recipes.models import Recipe, IngredientInRecipe, Tag
 from users.models import User
 
 
@@ -33,6 +33,32 @@ class IngredientViewSetTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.check_object(response.data, self.ingredient_1)
+
+
+class TagViewSetTestCase(TestCase):
+    def setUp(self) -> None:
+        self.tag = Tag.objects.create(
+            name='Поздний завтрак',
+            color='#90EE90',
+            slug='brunch'
+        )
+
+    def check_object(self, data, obj):
+        self.assertEqual(data.get('name'), obj.name)
+        self.assertEqual(data.get('color'), obj.color)
+        self.assertEqual(data.get('slug'), obj.slug)
+
+    def test_get_list(self):
+        url = reverse('api:tags-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_get_detail(self):
+        url = reverse('api:tags-detail', kwargs={'pk': self.tag.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.check_object(response.data, self.tag)
 
 
 class RecipeViewSetTestCase(TestCase):
