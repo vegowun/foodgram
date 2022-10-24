@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
+from users.apps import USER, ADMIN, ROLES
+from users.managers import CustomUserManager
+
 
 class User(AbstractUser):
     """Кастомная модель пользователя"""
@@ -27,6 +30,14 @@ class User(AbstractUser):
         max_length=150,
         verbose_name='Фамилия'
     )
+    role = models.CharField(
+        verbose_name='Роль',
+        max_length=15,
+        choices=ROLES,
+        default=USER
+    )
+
+    objects = CustomUserManager()
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -35,3 +46,11 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def is_user(self):
+        return self.role == USER
+
+    @property
+    def is_admin(self):
+        return self.role == ADMIN
