@@ -1,6 +1,15 @@
 from rest_framework import serializers
 
 from recipes.models import Recipe, IngredientInRecipe
+from users.models import User
+
+
+class AuthorRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для автора рецепта"""
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',)
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
@@ -16,11 +25,15 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Recipe."""
+    author = serializers.SerializerMethodField(read_only=True)
     ingredients = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'ingredients', 'tags', 'image', 'cooking_time',)
+        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time',)
+
+    def get_author(self, obj):
+        return AuthorRecipeSerializer(obj.author).data
 
     def get_ingredients(self, obj):
         ingredients = IngredientInRecipe.objects.filter(recipe=obj)
