@@ -5,7 +5,7 @@ from api.serializers.recipes import RecipeSerializer, RecipeCreateSerializer
 from recipes.models import Recipe
 
 
-class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
+class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет рецептов класса Recipe"""
 
     queryset = Recipe.objects.all()
@@ -15,7 +15,3 @@ class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action in ('list', 'retrieve'):
             return RecipeSerializer
         return RecipeCreateSerializer
-
-    @staticmethod
-    def create_object(request, pk, serializers):
-        pass
