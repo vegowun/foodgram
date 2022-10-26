@@ -51,36 +51,31 @@ class RecipeSerializer(serializers.ModelSerializer):
         return TagSerializer(tags, many=True).data
 
 
-class RecipeCreateSerializer(RecipeSerializer):
+class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания и изменения рецептов"""
     image = Base64ImageField(
         max_length=None, use_url=True,
     )
+    ingredients = IngredientInRecipeSerializer(source="ingredient_amount", many=True)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time', 'author',)
+        fields = ('id', 'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time')
         extra_kwargs = {
             'ingredients': {'required': True},
             'tags': {'required': True}
         }
 
     def validate(self, data):
-        ingredients = self.context['request'].data.get('ingredients', None)
-        tags = self.context['request'].data.get('tags', None)
-        if ingredients is None:
-            raise serializers.ValidationError('ingredients: Обязательное поле')
-        if tags is None:
-            raise serializers.ValidationError('tags: Обязательное поле')
         data.update({
             'author': self.context['request'].user,
-            'ingredients': ingredients,
-            'tags': tags
+            'ingredients': self.context['request'].data['ingredients']
         })
         return data
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
+        validated_data.pop('ingredient_amount')
         recipe = super().create(validated_data)
         for ingredient in ingredients:
             IngredientInRecipe.objects.create(
@@ -89,3 +84,8 @@ class RecipeCreateSerializer(RecipeSerializer):
                 amount=ingredient['amount'],
             )
         return recipe
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return RecipeSerializer(instance, context=context).data
