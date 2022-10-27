@@ -92,8 +92,6 @@ class RecipeCreateEditSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        if instance.author != validated_data['author']:
-            raise serializers.ValidationError({'detail': 'У вас недостаточно прав для выполнения данного действия.'})
         new_ingredients = validated_data.pop('ingredients')
         recipe = super().update(instance, validated_data)
         old_ingredients_objects = IngredientInRecipe.objects.filter(recipe=instance.id)
