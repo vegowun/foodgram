@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from rest_framework import serializers
 
 from api.serializers.custom_fields import Base64ImageField
@@ -51,7 +53,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return TagSerializer(tags, many=True).data
 
 
-class RecipeCreateSerializer(serializers.ModelSerializer):
+class RecipeCreateEditSerializer(serializers.ModelSerializer):
     """Сериализатор для создания и изменения рецептов"""
     image = Base64ImageField(
         max_length=None, use_url=True,
@@ -67,22 +69,43 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
+        data.pop('ingredient_amount')
         data.update({
             'author': self.context['request'].user,
             'ingredients': self.context['request'].data['ingredients']
         })
         return data
 
-    def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        validated_data.pop('ingredient_amount')
-        recipe = super().create(validated_data)
+    @staticmethod
+    def create_ingredients_in_recipe(recipe_id, ingredients):
         for ingredient in ingredients:
             IngredientInRecipe.objects.create(
                 ingredient_id=ingredient['id'],
-                recipe_id=recipe.id,
-                amount=ingredient['amount'],
+                recipe_id=recipe_id,
+                amount=ingredient['amount']
             )
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        recipe = super().create(validated_data)
+        self.create_ingredients_in_recipe(recipe.id, ingredients)
+        return recipe
+
+    def update(self, instance, validated_data):
+        if instance.author != validated_data['author']:
+            raise serializers.ValidationError({'detail': 'У вас недостаточно прав для выполнения данного действия.'})
+        new_ingredients = validated_data.pop('ingredients')
+        recipe = super().update(instance, validated_data)
+        old_ingredients_objects = IngredientInRecipe.objects.filter(recipe=instance.id)
+        old_ingredients = [
+            {
+                'id': old_ingredient.ingredient_id,
+                'amount': old_ingredient.amount
+            } for old_ingredient in old_ingredients_objects
+        ]
+        if sorted(old_ingredients, key=itemgetter('id')) != sorted(new_ingredients, key=itemgetter('id')):
+            old_ingredients_objects.delete()
+            self.create_ingredients_in_recipe(instance.id, new_ingredients)
         return recipe
 
     def to_representation(self, instance):
