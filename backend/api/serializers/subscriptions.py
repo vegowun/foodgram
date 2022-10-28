@@ -1,17 +1,8 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
-from api.serializers.recipes import AuthorRecipeSerializer
-from recipes.models import Tag, Follow, Recipe
+from api.serializers.recipes import AuthorRecipeSerializer, RecipesShortInfo
+from recipes.models import Follow, Recipe
 from users.models import User
-
-
-class RecipesAuthorSerializerForSubscription(serializers.ModelSerializer):
-    """Сериализатор для отображения рецептов автора в подписке."""
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time',)
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -43,7 +34,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         data = AuthorRecipeSerializer(author, context={'request': self.context.get('request')}).data
         author_recipes = Recipe.objects.filter(author=author)
         data.update({
-            'recipes': RecipesAuthorSerializerForSubscription(author_recipes, many=True).data,
+            'recipes': RecipesShortInfo(author_recipes, many=True).data,
             'recipes_count': author_recipes.count()
         })
         return data

@@ -118,6 +118,25 @@ class IngredientInRecipe(models.Model):
         return f'{self.ingredient} {self.recipe}'
 
 
+class Favorite(models.Model):
+    """Класс для добавления рецептов в избранное"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorite',
+        verbose_name='Избранный рецепт',
+    )
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
+
+
 class Follow(models.Model):
     """Класс для подписки на авторов рецепта"""
     user = models.ForeignKey(

@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from api.serializers.custom_fields import Base64ImageField
 from api.serializers.tags import TagSerializer
-from recipes.models import Recipe, IngredientInRecipe, Tag, Follow
+from recipes.models import Recipe, IngredientInRecipe, Tag, Follow, Favorite
 from users.models import User
 
 
@@ -18,7 +18,7 @@ class AuthorRecipeSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, value):
         request = self.context.get('request')
-        if request is None:
+        if not request.user.is_authenticated:
             return False
         return Follow.objects.filter(user=request.user, author=value).exists()
 
@@ -43,10 +43,11 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField(read_only=True)
     ingredients = serializers.SerializerMethodField(read_only=True)
     tags = serializers.SerializerMethodField(read_only=True)
+    is_favorited = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time',)
+        fields = ('id', 'tags', 'author', 'ingredients',  'is_favorited', 'name', 'image', 'text', 'cooking_time',)
 
     def get_author(self, obj):
         request = self.context.get('request')
@@ -60,6 +61,12 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_tags(self, obj):
         tags = Tag.objects.filter(recipes=obj)
         return TagSerializer(tags, many=True).data
+
+    def get_is_favorited(self, obj):
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            return False
+        return Favorite.objects.filter(user=request.user, recipe=obj.id).exists()
 
 
 class RecipeCreateEditSerializer(serializers.ModelSerializer):
@@ -119,3 +126,11 @@ class RecipeCreateEditSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         context = {'request': request}
         return RecipeSerializer(instance, context=context).data
+
+
+class RecipesShortInfo(serializers.ModelSerializer):
+    """Сериализатор для отображения рецептов избранном, подписке и списке покупок."""
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time',)
