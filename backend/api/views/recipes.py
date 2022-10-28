@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
 from api.pagination import LimitPageNumberPagination
-from api.permissions import IsAuthenticatedUser, AuthorOrReadonly
+from api.permissions import AuthorOrReadonly
 from api.serializers.recipes import RecipeSerializer, RecipeCreateEditSerializer
 from recipes.models import Recipe
 

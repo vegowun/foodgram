@@ -139,6 +139,7 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
+    'HIDE_USERS': False,
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
         'user': 'api.serializers.users.UserGetSerializer',
@@ -149,7 +150,6 @@ DJOSER = {
         'user': ('djoser.permissions.CurrentUserOrAdminOrReadOnly',),
         'user_list': ('rest_framework.permissions.AllowAny',)
     },
-    'HIDE_USERS': False
 }
 
 MEDIA_URL = '/media/'
