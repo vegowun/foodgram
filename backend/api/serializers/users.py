@@ -1,12 +1,21 @@
 from rest_framework import serializers
 
+from recipes.models import Follow
 from users.models import User
 
 
 class UserGetSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',)
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed',)
+
+    def get_is_subscribed(self, value):
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            return False
+        return Follow.objects.filter(user=request.user, author=value).exists()
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

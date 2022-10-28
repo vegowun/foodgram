@@ -4,23 +4,8 @@ from rest_framework import serializers
 
 from api.serializers.custom_fields import Base64ImageField
 from api.serializers.tags import TagSerializer
-from recipes.models import Recipe, IngredientInRecipe, Tag, Follow, Favorite, ShoppingCart
-from users.models import User
-
-
-class AuthorRecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для автора рецепта"""
-    is_subscribed = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
-
-    def get_is_subscribed(self, value):
-        request = self.context.get('request')
-        if not request.user.is_authenticated:
-            return False
-        return Follow.objects.filter(user=request.user, author=value).exists()
+from api.serializers.users import UserGetSerializer
+from recipes.models import Recipe, IngredientInRecipe, Tag, Favorite, ShoppingCart
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
@@ -64,7 +49,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_author(self, obj):
         request = self.context.get('request')
         context = {'request': request}
-        return AuthorRecipeSerializer(obj.author, context=context).data
+        return UserGetSerializer(obj.author, context=context).data
 
     def get_ingredients(self, obj):
         ingredients = IngredientInRecipe.objects.filter(recipe=obj)

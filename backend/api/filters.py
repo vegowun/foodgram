@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from recipes.models import Recipe
+from recipes.models import Recipe, Tag
 
 
 class IngredientsFilter(filters.FilterSet):
@@ -11,6 +11,11 @@ class IngredientsFilter(filters.FilterSet):
 
 
 class RecipesFilter(filters.FilterSet):
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        queryset=Tag.objects.all(),
+        to_field_name='slug',
+    )
     is_favorited = filters.BooleanFilter(
         method='get_is_favorited'
     )
@@ -20,7 +25,7 @@ class RecipesFilter(filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ('is_favorited', 'is_in_shopping_cart',)
+        fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart',)
 
     def get_is_favorited(self, queryset, name, value):
         user = self.request.user

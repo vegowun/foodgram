@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from api.serializers.recipes import AuthorRecipeSerializer, RecipesShortInfo
+from api.serializers.recipes import RecipesShortInfo
+from api.serializers.users import UserGetSerializer
 from recipes.models import Follow, Recipe
 from users.models import User
 
@@ -31,7 +32,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         author = instance.author
-        data = AuthorRecipeSerializer(author, context={'request': self.context.get('request')}).data
+        data = UserGetSerializer(author, context={'request': self.context.get('request')}).data
         author_recipes = Recipe.objects.filter(author=author)
         data.update({
             'recipes': RecipesShortInfo(author_recipes, many=True).data,
