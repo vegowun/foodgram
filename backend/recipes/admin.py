@@ -22,7 +22,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'image',
         'get_str_tags',
     )
-    search_fields = ('name',)
+    search_fields = ('name', 'author', 'tags')
     empty_value_display = '-пусто-'
 
 
