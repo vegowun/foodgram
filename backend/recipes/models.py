@@ -1,11 +1,23 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 from recipes.ingredients.models import Ingredient
 from users.models import User
 
 
-class Tag(models.Model):
+class CreatedModel(models.Model):
+    """Абстрактная модель. Добавляет дату создания."""
+    created = models.DateTimeField(
+        'Дата создания',
+        default=timezone.now
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Tag(CreatedModel):
     """Класс тегов"""
     name = models.CharField(
         max_length=200,
@@ -28,7 +40,7 @@ class Tag(models.Model):
         return self.name
 
 
-class Recipe(models.Model):
+class Recipe(CreatedModel):
     """Класс рецептов"""
     author = models.ForeignKey(
         User,
@@ -66,6 +78,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
+        ordering = ['-created']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -118,7 +131,7 @@ class IngredientInRecipe(models.Model):
         return f'{self.ingredient} {self.recipe}'
 
 
-class ShoppingCart(models.Model):
+class ShoppingCart(CreatedModel):
     """Класс для добавления рецептов в список покупок."""
     user = models.ForeignKey(
         User,
@@ -137,7 +150,7 @@ class ShoppingCart(models.Model):
         verbose_name_plural = 'Список покупок'
 
 
-class Favorite(models.Model):
+class Favorite(CreatedModel):
     """Класс для добавления рецептов в избранное"""
     user = models.ForeignKey(
         User,
@@ -156,7 +169,7 @@ class Favorite(models.Model):
         verbose_name_plural = 'Избранное'
 
 
-class Follow(models.Model):
+class Follow(CreatedModel):
     """Класс для подписки на авторов рецепта"""
     user = models.ForeignKey(
         User,
