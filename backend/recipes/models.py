@@ -118,6 +118,25 @@ class IngredientInRecipe(models.Model):
         return f'{self.ingredient} {self.recipe}'
 
 
+class ShoppingCart(models.Model):
+    """Класс для добавления рецептов в список покупок."""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='shopping_cart',
+        verbose_name='Рецепт в списке покупок',
+    )
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
+
+
 class Favorite(models.Model):
     """Класс для добавления рецептов в избранное"""
     user = models.ForeignKey(

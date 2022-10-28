@@ -4,6 +4,7 @@ from rest_framework import routers
 from api.views.favorite import FavoriteViewSet
 from api.views.ingredients import IngredientViewSet
 from api.views.recipes import RecipeViewSet
+from api.views.shopping_cart import ShoppingCartViewSet
 from api.views.subscriptions import SubscribeViewSet, SubscriptionsViewSet
 from api.views.tags import TagViewSet
 
@@ -22,6 +23,10 @@ router.register(
 router.register(
     r'recipes/(?P<id>[\d]+)/favorite',
     FavoriteViewSet, basename='favorite'
+)
+router.register(
+    r'recipes/(?P<id>[\d]+)/shopping_cart',
+    ShoppingCartViewSet, basename='shopping_cart'
 )
 
 app_name = 'api'
