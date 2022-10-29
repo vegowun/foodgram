@@ -4,12 +4,14 @@ from django.core.management.base import BaseCommand, CommandError
 
 from recipes.ingredients.models import Ingredient
 
+PATH_JSON_INGREDIENTS = ''
+
 
 class Command(BaseCommand):
     help = 'Загрузка ингредиентов в БД'
 
     def handle(self, *args, **options):
-        with open(r'C:\Projects\Dev\foodgram\data\ingredients.json', encoding='utf-8') as data_file:
+        with open(PATH_JSON_INGREDIENTS, encoding='utf-8') as data_file:
             json_data = json.loads(data_file.read())
         Ingredient.objects.bulk_create(
             (
