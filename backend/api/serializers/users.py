@@ -1,3 +1,5 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from recipes.models import Follow
@@ -38,8 +40,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
             last_name=validated_data['last_name']
         )
         password = validated_data['password']
-        if not user.check_password(password):
-            raise serializers.ValidationError({'detail': 'Пароль не удовлетворяет требованиям.'})
+        try:
+            validate_password(validated_data['password'])
+        except ValidationError as error:
+            error = '\n'.join(error)
+            raise serializers.ValidationError({'detail': f'Пароль не удовлетворяет требованиям!\n {error}'})
         user.set_password(validated_data['password'])
         user.save()
         return user
