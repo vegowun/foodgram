@@ -6,7 +6,7 @@ from recipes.models import Tag, Recipe, IngredientInRecipe, Follow, Favorite, Sh
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'color', 'slug',)
-    search_fields = ('name',)
+    list_filter = ('name',)
     empty_value_display = '-пусто-'
 
 
@@ -22,33 +22,33 @@ class RecipeAdmin(admin.ModelAdmin):
         'image',
         'get_str_tags',
     )
-    search_fields = ('name', 'author', 'tags')
+    list_filter = ('name', 'author', 'tags')
     empty_value_display = '-пусто-'
 
 
 @admin.register(IngredientInRecipe)
 class IngredientInRecipeAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'ingredient', 'amount',)
-    search_fields = ('ingredient',)
+    list_filter = ('ingredient',)
     empty_value_display = '-пусто-'
 
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'author',)
-    search_fields = ('user', 'author',)
+    list_filter = ('user', 'author',)
     empty_value_display = '-пусто-'
 
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe',)
-    search_fields = ('user', 'recipe',)
+    list_filter = ('user', 'recipe',)
     empty_value_display = '-пусто-'
 
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe',)
-    search_fields = ('user', 'recipe',)
+    list_filter = ('user', 'recipe',)
     empty_value_display = '-пусто-'
