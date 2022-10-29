@@ -26,5 +26,11 @@ class FavoriteSerializer(serializers.ModelSerializer):
         })
         return data
 
+    def create(self, validated_data):
+        favorite = super().create(validated_data)
+        validated_data['recipe'].favorite_count += 1
+        validated_data['recipe'].save()
+        return favorite
+
     def to_representation(self, instance):
         return RecipesShortInfo(instance.recipe).data

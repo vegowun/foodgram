@@ -37,6 +37,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name']
         )
+        password = validated_data['password']
+        if not user.check_password(password):
+            raise serializers.ValidationError({'detail': 'Пароль не удовлетворяет требованиям.'})
         user.set_password(validated_data['password'])
         user.save()
         return user

@@ -1,10 +1,11 @@
 import json
+import os
 
 from django.core.management.base import BaseCommand, CommandError
 
 from recipes.ingredients.models import Ingredient
 
-PATH_JSON_INGREDIENTS = ''
+PATH_JSON_INGREDIENTS = os.getenv('PATH_JSON_INGREDIENTS')
 
 
 class Command(BaseCommand):

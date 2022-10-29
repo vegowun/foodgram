@@ -1,6 +1,22 @@
 from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.forms import ModelForm
 
 from recipes.models import Tag, Recipe, IngredientInRecipe, Follow, Favorite, ShoppingCart
+
+
+class RecipeAdminForm(ModelForm):
+    def clean_ingredients(self):
+        data = self.cleaned_data['ingredients']
+        if data is None:
+            raise ValidationError('Обязательное поле')
+        return self.cleaned_data['ingredients']
+
+
+class RecipeIngredientChoiceInline(admin.TabularInline):
+    model = IngredientInRecipe
+    fields = ('ingredient', 'amount',)
+    min_num = 1
 
 
 @admin.register(Tag)
@@ -17,12 +33,12 @@ class RecipeAdmin(admin.ModelAdmin):
         'author',
         'name',
         'get_str_ingredients',
-        'text',
-        'cooking_time',
-        'image',
         'get_str_tags',
+        'favorite_count'
     )
     list_filter = ('name', 'author', 'tags')
+    inlines = (RecipeIngredientChoiceInline,)
+    readonly_fields = ('favorite_count',)
     empty_value_display = '-пусто-'
 
 

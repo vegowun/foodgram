@@ -76,6 +76,10 @@ class Recipe(CreatedModel):
         related_name='recipes',
         verbose_name='Список id тегов'
     )
+    favorite_count = models.IntegerField(
+        verbose_name='Число добавлений рецепта в избранное',
+        default=0
+    )
 
     class Meta:
         ordering = ['-created']
