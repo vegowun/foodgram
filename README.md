@@ -78,3 +78,37 @@ GET http://127.0.0.1:8000/api/recipes/download_shopping_cart/
 ```
 http://localhost/api/docs
 ```
+
+### Проект развернут и доступен на сервере - http://51.250.23.122
+
+### Процесс деплоя
+
+В директории infra необходимо создать .env файл
+
+### Наполнение .env файла
+
+```angular2html
+SECRET_KEY=
+DEBUG=False
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+DB_HOST=db
+DB_PORT=5432
+PATH_JSON_INGREDIENTS=/app/data/ingredients.json
+```
+
+### Запуск приложения в контейнерах
+
+Находясь в директории infra необходимо выполнить команду
+
+```
+docker-compose up -d --build
+```
+
+После успешного запуска контейнеров необходимо создать супер пользователя
+
+```
+docker-compose exec backend python manage.py createsuperuser
+```
