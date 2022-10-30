@@ -88,6 +88,11 @@ class RecipeCreateEditSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
+        """
+        Валидация входящих данных.
+        :param data: данные
+        :return: обновленные данные, содержащие автора и ингредиенты
+        """
         data.pop('ingredient_amount')
         data.update({
             'author': self.context['request'].user,
@@ -97,6 +102,11 @@ class RecipeCreateEditSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def create_ingredients_in_recipe(recipe_id, ingredients):
+        """
+        Создание объектов промежуточной модели IngredientInRecipe.
+        :param recipe_id: к какому рецепту создать
+        :param ingredients: необходимые ингредиенты с количеством
+        """
         for ingredient in ingredients:
             IngredientInRecipe.objects.create(
                 ingredient_id=ingredient['id'],
@@ -105,12 +115,25 @@ class RecipeCreateEditSerializer(serializers.ModelSerializer):
             )
 
     def create(self, validated_data):
+        """
+        Создание объекта рецепта с предварительным удалением рецептов из данных.
+        :param validated_data: провалидированные данные
+        :return: созданный объект рецепта
+        """
         ingredients = validated_data.pop('ingredients')
         recipe = super().create(validated_data)
         self.create_ingredients_in_recipe(recipe.id, ingredients)
         return recipe
 
     def update(self, instance, validated_data):
+        """
+        Редактирование рецепта
+        Удаление и создание объектов промежуточной модели IngredientInRecipe происходит только в случае,
+        если данные отличаются.
+        :param instance: рецепт
+        :param validated_data: провалидированные данные
+        :return: отредактированный рецепт
+        """
         new_ingredients = validated_data.pop('ingredients')
         recipe = super().update(instance, validated_data)
         old_ingredients_objects = IngredientInRecipe.objects.filter(recipe=instance.id)
@@ -126,6 +149,11 @@ class RecipeCreateEditSerializer(serializers.ModelSerializer):
         return recipe
 
     def to_representation(self, instance):
+        """
+        Отображение данных рецепта через RecipeSerializer.
+        :param instance: рецепт
+        :return: сериализованные данные
+        """
         request = self.context.get('request')
         context = {'request': request}
         return RecipeSerializer(instance, context=context).data

@@ -91,7 +91,6 @@ class RecipeViewSetTestCase(TestCase):
         )
 
         self.url_list = reverse('api:recipes-list')
-        # self.url_detail = reverse('api:recipes-detail')
 
     def check_object(self, data, obj):
         self.assertEqual(data.get('id'), obj.pk)

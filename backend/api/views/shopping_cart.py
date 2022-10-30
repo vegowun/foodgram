@@ -1,10 +1,9 @@
-from django.http import FileResponse, HttpResponse
-from rest_framework import viewsets, status, renderers, views
+from django.http import HttpResponse
+from rest_framework import viewsets, status, views
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.permissions import IsAuthenticatedUser
-from api.serializers.recipes import RecipeSerializer, IngredientInRecipeSerializer
 from api.serializers.shopping_cart import ShoppingCartSerializer
 from recipes.models import Recipe, ShoppingCart
 
@@ -17,6 +16,7 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
 
     @action(methods=['delete'], detail=False)
     def delete(self, request, *args, **kwargs):
+        """Метод для удаления рецепта из списка покупок."""
         user = self.request.user
         recipe = Recipe.objects.get(pk=int(kwargs['id']))
         if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
@@ -33,6 +33,10 @@ class ShoppingCartDownloadView(views.APIView):
     permission_classes = (IsAuthenticatedUser,)
 
     def prepare_shopping_cart(self):
+        """
+        Создание контента для файла со списком покупок.
+        Количество повторяющихся ингредиентов суммируется.
+        """
         ingredients_recipes = [
             unit.recipe.ingredient_amount.all() for unit in ShoppingCart.objects.filter(user=self.request.user)
         ]
@@ -49,6 +53,7 @@ class ShoppingCartDownloadView(views.APIView):
         return shopping_ingredients
 
     def get(self, *args, **kwargs):
+        """Получение файла со списком покупок GET запросом."""
         shopping_ingredients = self.prepare_shopping_cart()
         shopping_list = '\n'.join([f'{name} - {amount}' for name, amount in shopping_ingredients.items()])
         response = HttpResponse(shopping_list, content_type='text/plain; charset=utf8')

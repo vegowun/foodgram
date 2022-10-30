@@ -90,6 +90,7 @@ class Recipe(CreatedModel):
         return self.name
 
     def get_str_ingredients(self):
+        """Отображение ингредиентов в списке рецептов."""
         return '\n'.join(
             [
                 f'{ingredient.name} - {ingredient.ingredient_amount.filter(recipe=self.pk)[0].amount} '
@@ -101,6 +102,7 @@ class Recipe(CreatedModel):
     get_str_ingredients.short_description = 'Ингредиенты'
 
     def get_str_tags(self):
+        """Отображение тегов в списке рецептов."""
         return '\n'.join([tag.name for tag in self.tags.all()])
 
     get_str_tags.short_description = 'Теги'

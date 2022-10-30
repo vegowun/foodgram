@@ -16,6 +16,11 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         fields = ('user',)
 
     def validate(self, data):
+        """
+        Валидация входящих данных.
+        :param data: данные
+        :return: обновленные данные, содержащие пользователя и рецепт
+        """
         user_id = self.context.get('request').user.id
         recipe_id = self.context.get('request').parser_context.get('kwargs').get('id')
         if ShoppingCart.objects.filter(user=user_id, recipe=recipe_id).exists():
@@ -27,4 +32,5 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
+        """Ответ в виде короткой информации о рецепте."""
         return RecipesShortInfo(instance.recipe).data

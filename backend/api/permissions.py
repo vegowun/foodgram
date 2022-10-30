@@ -5,17 +5,14 @@ ERROR_MESSAGE = 'У вас недостаточно прав для выполн
 
 
 class IsAuthenticatedUser(permissions.BasePermission):
+    """Permission класс для аутентифицированных пользователей."""
     def has_permission(self, request, view):
         return request.user.is_authenticated
 
 
-class IsAuthenticatedUserOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.method in permissions.SAFE_METHODS or request.user.is_authenticated
-
-
 class AuthorOrReadonly(permissions.BasePermission):
-
+    """Permission класс для аутентифицированных пользователей для safe методов и возможностью редактирования
+    и удаления только своего контента."""
     def has_permission(self, request, view):
         return request.user.is_authenticated or request.method in permissions.SAFE_METHODS
 

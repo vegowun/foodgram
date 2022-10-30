@@ -18,6 +18,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorOrReadonly,)
 
     def get_serializer_class(self):
+        """Возврат необходимого сериализатора в зависимости от метода в запросе."""
         if self.action in ('list', 'retrieve'):
             return RecipeSerializer
         return RecipeCreateEditSerializer

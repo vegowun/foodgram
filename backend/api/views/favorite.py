@@ -15,6 +15,7 @@ class FavoriteViewSet(viewsets.ModelViewSet):
 
     @action(methods=['delete'], detail=False)
     def delete(self, request, *args, **kwargs):
+        """Метод для удаления рецепта из избранного. """
         user = self.request.user
         recipe = Recipe.objects.get(pk=int(kwargs['id']))
         if Favorite.objects.filter(user=user, recipe=recipe).exists():

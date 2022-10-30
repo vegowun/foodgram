@@ -16,6 +16,11 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = ('user',)
 
     def validate(self, data):
+        """
+        Валидация входящих данных.
+        :param data: данные
+        :return: обновленные данные, содержащие пользователя и рецепт
+        """
         user_id = self.context.get('request').user.id
         recipe_id = self.context.get('request').parser_context.get('kwargs').get('id')
         if Favorite.objects.filter(user=user_id, recipe=recipe_id).exists():
@@ -27,10 +32,16 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        """
+        Создание объекта избранного с добавлением рецепту 1 для отслеживания количества добавлений в избранное.
+        :param validated_data: провалидированные данные
+        :return: созданный объект подписки
+        """
         favorite = super().create(validated_data)
         validated_data['recipe'].favorite_count += 1
         validated_data['recipe'].save()
         return favorite
 
     def to_representation(self, instance):
+        """Ответ в виде короткой информации о рецепте."""
         return RecipesShortInfo(instance.recipe).data

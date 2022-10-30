@@ -18,6 +18,11 @@ class SubscribeSerializer(serializers.ModelSerializer):
         fields = ('user',)
 
     def validate(self, data):
+        """
+        Валидация входящих данных.
+        :param data: данные
+        :return: обновленные данные, содержащие пользователя и автора
+        """
         user_id = self.context.get('request').user.id
         author_id = self.context.get('request').parser_context.get('kwargs').get('id')
         if user_id == author_id:
@@ -31,6 +36,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
+        """Ответ, содержащий все рецепты автора и количество рецептов."""
         author = instance.author
         data = UserGetSerializer(author, context={'request': self.context.get('request')}).data
         author_recipes = Recipe.objects.filter(author=author)

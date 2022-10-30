@@ -28,6 +28,7 @@ class SubscribeViewSet(viewsets.ModelViewSet):
 
     @action(methods=['delete'], detail=False)
     def delete(self, request, *args, **kwargs):
+        """Метод для отписки текущего пользователя от автора рецептов."""
         user = self.request.user
         author = User.objects.get(pk=int(kwargs['id']))
         if Follow.objects.filter(user=user, author=author).exists():

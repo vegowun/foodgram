@@ -7,6 +7,7 @@ from users.models import User
 
 
 class UserGetSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения данных о пользователя. """
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -14,6 +15,7 @@ class UserGetSerializer(serializers.ModelSerializer):
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed',)
 
     def get_is_subscribed(self, value):
+        """Подписан ли текущий пользователь на автора рецепта."""
         request = self.context.get('request')
         if not request.user.is_authenticated:
             return False
@@ -21,6 +23,8 @@ class UserGetSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для регистрации пользователя. """
+
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password',)
@@ -32,7 +36,21 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'password': {'required': True, 'write_only': True},
         }
 
+    def validate(self, data):
+        """
+        Проверка пароля требованиям у создаваемого пользователя.
+        :param data: входяшие данные.
+        :return: данные о создаваемом пользователе.
+        """
+        try:
+            validate_password(data['password'])
+        except ValidationError as error:
+            error = '\n'.join(error)
+            raise serializers.ValidationError({'detail': f'Пароль не удовлетворяет требованиям!\n {error}'})
+        return data
+
     def create(self, validated_data):
+        """Создание пользователя."""
         user = User(
             email=validated_data['email'],
             username=validated_data['username'],
@@ -40,11 +58,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
             last_name=validated_data['last_name']
         )
         password = validated_data['password']
-        try:
-            validate_password(validated_data['password'])
-        except ValidationError as error:
-            error = '\n'.join(error)
-            raise serializers.ValidationError({'detail': f'Пароль не удовлетворяет требованиям!\n {error}'})
         user.set_password(validated_data['password'])
         user.save()
         return user

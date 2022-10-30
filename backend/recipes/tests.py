@@ -1,5 +1,3 @@
-from backend.foodgram.wsgi import *
-
 from unittest import TestCase
 
 from recipes.models import Tag
