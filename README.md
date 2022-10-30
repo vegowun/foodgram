@@ -1,4 +1,5 @@
 ### Foodgram
+![workflow](https://github.com/gevolx/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 
 Проект "продуктовый помощник".
 Сайт, на котором пользователи могут публиковать рецепты, добавлять чужие рецепты в избранное и подписываться на
