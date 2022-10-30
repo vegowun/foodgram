@@ -41,6 +41,7 @@ jobs:
             cd ~/foodgram/infra/
             sudo docker compose stop
             sudo docker compose rm backend
+            sudo docker compose pull
             sudo docker compose up -d 
 
   send_message:
